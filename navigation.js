@@ -1,8 +1,19 @@
 'use strict';
 const fs = require('fs');
 
-function processFile(){
+function validateDirtLocation(gridSize, dirtLocation){
+  var dirtX = parseInt(dirtLocation[0]);
+  var dirtY = parseInt(dirtLocation[1]);
 
+  var gridXMax = parseInt(gridSize[0])-1;
+  var gridYMax = parseInt(gridSize[1])-1;
+
+  if(dirtX > gridXMax || dirtY > gridYMax){
+    throw new Error('Error: dirt patch is outside the bounds of the grid.');
+  }
+}
+
+function processFile(){
   var fileName = process.argv[2];
   var file;
   try {
@@ -32,9 +43,8 @@ function processFile(){
       fileObj['directions'] = fileArray[i].split('');
 
     } else {
-      fileObj['']
+      validateDirtLocation(fileObj['gridSize'], fileArray[i]);
       fileObj['dirtLocations'].add(fileArray[i]);
-      //todo: Check to see that the locations make sense given the grid size
     }
   }
 

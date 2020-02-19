@@ -1,38 +1,41 @@
+'use strict';
 const fs = require('fs');
 
 function processFile(){
 
+  var fileName = process.argv[2];
   var file;
   try {
-    file = fs.readFileSync('input.txt', 'utf8');
+    file = fs.readFileSync(fileName, 'utf8');
 
   } catch (err){
-      console.log(err);
-    }
+    throw new Error(err.message);
+  }
+  var fileArray = file.split('\n');
+  var fileObj = {
+    gridSize:[],
+    initialPosition:[],
+    dirtLocations: new Set(),
+    directions: []
+  };
 
-    var fileArray = file.split('\n');
-    var fileObj = {
-      gridSize:[],
-      initialPosition:[],
-      dirtLocations: new Set(),
-      directions: []
-    };
-
-    for(var i = 0; i < fileArray.length; i++){
-      var temp = fileArray[i].split(' ');
-      if(i == 0){
-        fileObj['gridSize'] = fileArray[i].split(' ');
-      } else if( i == 1) {
-        fileObj['initialPosition'] = fileArray[i].split(' ');
-        //todo:  Check to see that the initial position makes sense given the grid size 
-      } else if(i == fileArray.length-1){
-        fileObj['directions'] = fileArray[i].split('');
-        //todo: Validate the directions 
-        //todo: validate that the last row contains directions 
-      } else {
-        fileObj['dirtLocations'].add(fileArray[i]);
-        //todo: Check to see that the locations make sense given the grid size 
+  for(var i = 0; i < fileArray.length; i++){
+    var temp = fileArray[i].split(' ');
+    if(i == 0){
+      fileObj['gridSize'] = fileArray[i].split(' ');
+    } else if( i == 1) {
+      fileObj['initialPosition'] = fileArray[i].split(' ');
+      if((parseInt(fileObj['initialPosition'][0]) > parseInt(fileObj['gridSize'][0])) || (parseInt(fileObj['initialPosition'][1]) > parseInt(fileObj['gridSize'][1]))){
+        throw new Error('Error: the initial position of the Roomba is outside the bounds of the room.');
       }
+    } else if(i == fileArray.length-1){
+      fileObj['directions'] = fileArray[i].split('');
+
+    } else {
+      fileObj['']
+      fileObj['dirtLocations'].add(fileArray[i]);
+      //todo: Check to see that the locations make sense given the grid size
+    }
   }
 
   return fileObj;
@@ -59,6 +62,8 @@ function cleanRoom(inputObj) {
       currPosition[0] += 1;
     } else if(currDirection == 'W'){
       currPosition[0] -= 1;
+    } else {
+      throw new Error('Error: Roomba can only accept N, S, E, and W as valid directions.');
     }
 
     var currentString = currPosition[0].toString()+' '+currPosition[1].toString();

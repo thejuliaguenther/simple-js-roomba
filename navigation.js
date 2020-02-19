@@ -1,18 +1,21 @@
 const fs = require('fs');
 
-function validateDirtLocation(gridSize, dirtLocation){
+function isInvalidLocation(gridSize, location){
 /*
  * This function takes in one of the locations of the dirt piles and
  * and checks if it is within the bounds of the grid dimensions.
  */
-  var dirtX = parseInt(dirtLocation[0]);
-  var dirtY = parseInt(dirtLocation[1]);
+
+  var locationX = parseInt(location[0]);
+  var locationY = parseInt(location[1]);
 
   var gridXMax = parseInt(gridSize[0])-1;
   var gridYMax = parseInt(gridSize[1])-1;
 
-  if(dirtX > gridXMax || dirtY > gridYMax){
-    throw new Error('Error: dirt patch is outside the bounds of the grid.');
+  if(locationX > gridXMax || locationY > gridYMax){
+    return true;
+  } else {
+    return false;
   }
 }
 
@@ -29,8 +32,8 @@ function processFile(){
  * dirtLocations, a Set containing the locations of every dirt pile within the grid
  * directions, which contains a list of all the directions that the Roomba will take to move about the room
  *
- * The function also performs error checking to ensure that the initial position is within the size of the grid
- * and calls the function that validates the dirt positions.
+ * The function also calls the function isInvalidLocation to validate the locations of the initial position
+ * and dirt patches.
  *
  * It then returns the file object for use later in the program.
  */
@@ -44,6 +47,7 @@ function processFile(){
     throw new Error(err.message);
   }
   var fileArray = file.split('\n');
+
   var fileObj = {
     gridSize:[],
     initialPosition:[],
@@ -57,15 +61,18 @@ function processFile(){
       fileObj['gridSize'] = fileArray[i].split(' ');
     } else if( i == 1) {
       fileObj['initialPosition'] = fileArray[i].split(' ');
-      if((parseInt(fileObj['initialPosition'][0]) > parseInt(fileObj['gridSize'][0])) || (parseInt(fileObj['initialPosition'][1]) > parseInt(fileObj['gridSize'][1]))){
-        throw new Error('Error: the initial position of the Roomba is outside the bounds of the room.');
+      if(isInvalidLocation(fileObj['gridSize'], fileObj['initialPosition'])){
+        throw new Error('the initial position of the Roomba is outside the bounds of the room.');
       }
     } else if(i == fileArray.length-1){
       fileObj['directions'] = fileArray[i].split('');
 
     } else {
-      validateDirtLocation(fileObj['gridSize'], fileArray[i]);
-      fileObj['dirtLocations'].add(fileArray[i]);
+      if(isInvalidLocation(fileObj['gridSize'], fileArray[i].split(' '))){
+        throw new Error('dirt patch is outside the bounds of the grid.');
+      } else{
+        fileObj['dirtLocations'].add(fileArray[i]);
+      }
     }
   }
 
@@ -84,6 +91,7 @@ function cleanRoom(inputObj) {
  *
  * This function also validates the directions and throws an error if there are any directions outside of N, S, E, W
  */
+
   console.log('The room is '+inputObj['gridSize'][0]+' x '+inputObj['gridSize'][1]);
   console.log('The robot will start cleaning the room from the position '+inputObj['initialPosition'].join(' '));
   console.log(' ');
@@ -105,7 +113,7 @@ function cleanRoom(inputObj) {
     } else if(currDirection == 'W'){
       currPosition[0] -= 1;
     } else {
-      throw new Error('Error: Roomba can only accept N, S, E, and W as valid directions.');
+      throw new Error('Roomba can only accept N, S, E, and W as valid directions.');
     }
 
     var currentString = currPosition[0].toString()+' '+currPosition[1].toString();

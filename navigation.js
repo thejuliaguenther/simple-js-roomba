@@ -1,7 +1,10 @@
-'use strict';
 const fs = require('fs');
 
 function validateDirtLocation(gridSize, dirtLocation){
+/*
+ * This function takes in one of the locations of the dirt piles and
+ * and checks if it is within the bounds of the grid dimensions.
+ */
   var dirtX = parseInt(dirtLocation[0]);
   var dirtY = parseInt(dirtLocation[1]);
 
@@ -14,7 +17,25 @@ function validateDirtLocation(gridSize, dirtLocation){
 }
 
 function processFile(){
-  var fileName = process.argv[2];
+/*
+ * This function takes in the name of the file containing the data from the
+ * command line and processes that file.
+ *
+ * It populates the fileObj, the main object in which the contents of the file are stored.
+ * The fileObj contains the following fields:
+ *
+ * gridSize, which contains the size of the grid
+ * initialPosition, which contains the starting position of the Roomba
+ * dirtLocations, a Set containing the locations of every dirt pile within the grid
+ * directions, which contains a list of all the directions that the Roomba will take to move about the room
+ *
+ * The function also performs error checking to ensure that the initial position is within the size of the grid
+ * and calls the function that validates the dirt positions.
+ *
+ * It then returns the file object for use later in the program.
+ */
+
+ var fileName = process.argv[2];
   var file;
   try {
     file = fs.readFileSync(fileName, 'utf8');
@@ -52,6 +73,17 @@ function processFile(){
 }
 
 function cleanRoom(inputObj) {
+/*
+ * This function takes in the object resulting from processing the file.
+ *
+ * It prints out the size of the grid and prints out the initial position of the roomba
+ * before printing following the directions to move the Roomba around the grid and clean up dirt piles.
+ *
+ * Once the Roomba has completed the directions, this function prints out the final position of the Roomba
+ * and the number of dirt patches cleaned up along the way.
+ *
+ * This function also validates the directions and throws an error if there are any directions outside of N, S, E, W
+ */
   console.log('The room is '+inputObj['gridSize'][0]+' x '+inputObj['gridSize'][1]);
   console.log('The robot will start cleaning the room from the position '+inputObj['initialPosition'].join(' '));
   console.log(' ');
@@ -90,4 +122,3 @@ function cleanRoom(inputObj) {
 
 var inputObj = processFile();
 cleanRoom(inputObj);
-
